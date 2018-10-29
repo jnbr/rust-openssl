@@ -156,7 +156,7 @@ pub struct EVP_PKEY {
 
 #[repr(C)]
 pub struct BIO {
-    pub method: *mut ::BIO_METHOD,
+    pub method: *const ::BIO_METHOD,
     pub callback: Option<
         unsafe extern "C" fn(*mut ::BIO, c_int, *const c_char, c_int, c_long, c_long) -> c_long,
     >,
@@ -474,9 +474,9 @@ pub unsafe fn SSL_CTX_clear_options(ctx: *const ::SSL_CTX, op: c_ulong) -> c_ulo
 }
 
 extern "C" {
-    pub fn BIO_new(type_: *mut BIO_METHOD) -> *mut BIO;
-    pub fn BIO_s_file() -> *mut BIO_METHOD;
-    pub fn BIO_s_mem() -> *mut BIO_METHOD;
+    pub fn BIO_new(type_: *const BIO_METHOD) -> *mut BIO;
+    pub fn BIO_s_file() -> *const BIO_METHOD;
+    pub fn BIO_s_mem() -> *const BIO_METHOD;
 
     pub fn get_rfc2409_prime_768(bn: *mut BIGNUM) -> *mut BIGNUM;
     pub fn get_rfc2409_prime_1024(bn: *mut BIGNUM) -> *mut BIGNUM;
@@ -506,13 +506,13 @@ extern "C" {
 
     pub fn OCSP_cert_to_id(
         dgst: *const ::EVP_MD,
-        subject: *mut ::X509,
-        issuer: *mut ::X509,
+        subject: *const ::X509,
+        issuer: *const ::X509,
     ) -> *mut ::OCSP_CERTID;
 
     pub fn PKCS12_create(
-        pass: *mut c_char,
-        friendly_name: *mut c_char,
+        pass: *const c_char,
+        friendly_name: *const c_char,
         pkey: *mut EVP_PKEY,
         cert: *mut X509,
         ca: *mut stack_st_X509,
@@ -545,7 +545,7 @@ extern "C" {
         ecdh: unsafe extern "C" fn(ssl: *mut ::SSL, is_export: c_int, keylength: c_int)
             -> *mut ::EC_KEY,
     );
-    pub fn SSL_CIPHER_get_version(cipher: *const ::SSL_CIPHER) -> *mut c_char;
+    pub fn SSL_CIPHER_get_version(cipher: *const ::SSL_CIPHER) -> *const c_char;
     pub fn SSL_CTX_get_ex_new_index(
         argl: c_long,
         argp: *mut c_void,
@@ -562,7 +562,7 @@ extern "C" {
     pub fn SSL_CTX_sess_set_get_cb(
         ctx: *mut ::SSL_CTX,
         get_session_cb: Option<
-            unsafe extern "C" fn(*mut ::SSL, *mut c_uchar, c_int, *mut c_int) -> *mut SSL_SESSION,
+            unsafe extern "C" fn(*mut ::SSL, *const c_uchar, c_int, *mut c_int) -> *mut SSL_SESSION,
         >,
     );
     #[cfg(libressl261)]
@@ -574,12 +574,12 @@ extern "C" {
     #[cfg(libressl270)]
     pub fn SSL_CTX_get_max_proto_version(ctx: *mut ::SSL_CTX) -> c_int;
 
-    pub fn X509_get_subject_name(x: *mut ::X509) -> *mut ::X509_NAME;
-    pub fn X509_get_issuer_name(x: *mut ::X509) -> *mut ::X509_NAME;
+    pub fn X509_get_subject_name(x: *const ::X509) -> *mut ::X509_NAME;
+    pub fn X509_get_issuer_name(x: *const ::X509) -> *mut ::X509_NAME;
     pub fn X509_set_notAfter(x: *mut ::X509, tm: *const ::ASN1_TIME) -> c_int;
     pub fn X509_set_notBefore(x: *mut ::X509, tm: *const ::ASN1_TIME) -> c_int;
     pub fn X509_get_ext_d2i(
-        x: *mut ::X509,
+        x: *const ::X509,
         nid: c_int,
         crit: *mut c_int,
         idx: *mut c_int,
@@ -588,29 +588,29 @@ extern "C" {
         x: *mut ::X509_NAME,
         field: c_int,
         ty: c_int,
-        bytes: *mut c_uchar,
+        bytes: *const c_uchar,
         len: c_int,
         loc: c_int,
         set: c_int,
     ) -> c_int;
-    pub fn X509_NAME_entry_count(n: *mut ::X509_NAME) -> c_int;
-    pub fn X509_NAME_get_entry(n: *mut ::X509_NAME, loc: c_int) -> *mut ::X509_NAME_ENTRY;
-    pub fn X509_NAME_ENTRY_get_data(ne: *mut ::X509_NAME_ENTRY) -> *mut ::ASN1_STRING;
-    pub fn X509_NAME_ENTRY_get_object(ne: *mut ::X509_NAME_ENTRY) -> *mut ::ASN1_OBJECT;
+    pub fn X509_NAME_entry_count(n: *const ::X509_NAME) -> c_int;
+    pub fn X509_NAME_get_entry(n: *const ::X509_NAME, loc: c_int) -> *mut ::X509_NAME_ENTRY;
+    pub fn X509_NAME_ENTRY_get_data(ne: *const ::X509_NAME_ENTRY) -> *mut ::ASN1_STRING;
+    pub fn X509_NAME_ENTRY_get_object(ne: *const ::X509_NAME_ENTRY) -> *mut ::ASN1_OBJECT;
     pub fn X509_STORE_CTX_get_chain(ctx: *mut ::X509_STORE_CTX) -> *mut stack_st_X509;
     pub fn X509V3_EXT_nconf_nid(
         conf: *mut ::CONF,
         ctx: *mut ::X509V3_CTX,
         ext_nid: c_int,
-        value: *mut c_char,
+        value: *const c_char,
     ) -> *mut ::X509_EXTENSION;
     pub fn X509V3_EXT_nconf(
         conf: *mut ::CONF,
         ctx: *mut ::X509V3_CTX,
-        name: *mut c_char,
-        value: *mut c_char,
+        name: *const c_char,
+        value: *const c_char,
     ) -> *mut ::X509_EXTENSION;
-    pub fn ASN1_STRING_to_UTF8(out: *mut *mut c_uchar, s: *mut ::ASN1_STRING) -> c_int;
+    pub fn ASN1_STRING_to_UTF8(out: *mut *mut c_uchar, s: *const ::ASN1_STRING) -> c_int;
     pub fn ASN1_STRING_data(x: *mut ::ASN1_STRING) -> *mut c_uchar;
     pub fn CRYPTO_add_lock(
         pointer: *mut c_int,
@@ -621,7 +621,7 @@ extern "C" {
     ) -> c_int;
     pub fn EVP_MD_CTX_create() -> *mut EVP_MD_CTX;
     pub fn EVP_MD_CTX_destroy(ctx: *mut EVP_MD_CTX);
-    pub fn EVP_PKEY_bits(key: *mut EVP_PKEY) -> c_int;
+    pub fn EVP_PKEY_bits(key: *const EVP_PKEY) -> c_int;
 
     pub fn sk_new_null() -> *mut _STACK;
     pub fn sk_num(st: *const _STACK) -> c_int;

@@ -1651,9 +1651,6 @@ extern "C" {
     pub fn BIO_new_socket(sock: c_int, close_flag: c_int) -> *mut BIO;
     pub fn BIO_read(b: *mut BIO, buf: *mut c_void, len: c_int) -> c_int;
     pub fn BIO_write(b: *mut BIO, buf: *const c_void, len: c_int) -> c_int;
-    #[cfg(not(ossl102))]
-    pub fn BIO_new_mem_buf(buf: *mut c_void, len: c_int) -> *mut BIO;
-    #[cfg(ossl102)]
     pub fn BIO_new_mem_buf(buf: *const c_void, len: c_int) -> *mut BIO;
     pub fn BIO_set_flags(b: *mut BIO, flags: c_int);
     pub fn BIO_clear_flags(b: *mut BIO, flags: c_int);
@@ -2051,13 +2048,6 @@ extern "C" {
         e: *mut ENGINE,
         pkey: *mut EVP_PKEY,
     ) -> c_int;
-    #[cfg(not(ossl102))]
-    pub fn EVP_DigestVerifyFinal(
-        ctx: *mut EVP_MD_CTX,
-        sigret: *mut c_uchar,
-        siglen: size_t,
-    ) -> c_int;
-    #[cfg(ossl102)]
     pub fn EVP_DigestVerifyFinal(
         ctx: *mut EVP_MD_CTX,
         sigret: *const c_uchar,
@@ -2477,9 +2467,6 @@ extern "C" {
     pub fn SSL_get_verify_result(ssl: *const SSL) -> c_long;
     pub fn SSL_shutdown(ssl: *mut SSL) -> c_int;
     pub fn SSL_get_certificate(ssl: *const SSL) -> *mut X509;
-    #[cfg(not(ossl102))]
-    pub fn SSL_get_privatekey(ssl: *mut SSL) -> *mut EVP_PKEY;
-    #[cfg(ossl102)]
     pub fn SSL_get_privatekey(ssl: *const SSL) -> *mut EVP_PKEY;
     pub fn SSL_load_client_CA_file(file: *const c_char) -> *mut stack_st_X509_NAME;
     pub fn SSL_set_tmp_dh_callback(
@@ -2712,7 +2699,7 @@ extern "C" {
         loc: c_int,
         set: c_int,
     ) -> c_int;
-    pub fn X509_NAME_get_index_by_NID(n: *mut X509_NAME, nid: c_int, last_pos: c_int) -> c_int;
+    pub fn X509_NAME_get_index_by_NID(n: *const X509_NAME, nid: c_int, last_pos: c_int) -> c_int;
 
     pub fn X509_NAME_ENTRY_free(x: *mut X509_NAME_ENTRY);
 
@@ -2858,18 +2845,11 @@ extern "C" {
     );
 
     // FIXME change to unsafe extern "C" fn
-    #[cfg(ossl110)]
     pub fn SSL_CTX_set_cookie_verify_cb(
         s: *mut SSL_CTX,
         cb: Option<
             extern "C" fn(ssl: *mut SSL, cookie: *const c_uchar, cookie_len: c_uint) -> c_int,
         >,
-    );
-
-    #[cfg(not(ossl110))]
-    pub fn SSL_CTX_set_cookie_verify_cb(
-        s: *mut SSL_CTX,
-        cb: Option<extern "C" fn(ssl: *mut SSL, cookie: *mut c_uchar, cookie_len: c_uint) -> c_int>,
     );
 
     pub fn EVP_MD_size(md: *const EVP_MD) -> c_int;
