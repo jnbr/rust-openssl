@@ -68,10 +68,10 @@ impl MemBio {
     }
 }
 
-#[cfg(not(ossl101))]
+#[cfg(all(not(ossl101), not(libressl28)))]
 use ffi::BIO_new_mem_buf;
 
-#[cfg(ossl101)]
+#[cfg(any(ossl101, libressl28))]
 #[allow(bad_style)]
 unsafe fn BIO_new_mem_buf(buf: *const ::libc::c_void, len: ::libc::c_int) -> *mut ffi::BIO {
     ffi::BIO_new_mem_buf(buf as *mut _, len)
