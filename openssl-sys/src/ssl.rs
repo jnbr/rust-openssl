@@ -1032,7 +1032,7 @@ extern "C" {
 }
 
 cfg_if! {
-    if #[cfg(ossl110)] {
+    if #[cfg(any(ossl110, libressl))] {
         extern "C" {
             pub fn TLS_method() -> *const SSL_METHOD;
 
